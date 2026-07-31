@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking — Faixa X / Faixa Y</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #12161d;
+    --panel: #1a2029;
+    --panel-2: #212938;
+    --line: #2a3242;
+    --text: #e7ecf2;
+    --muted: #8892a3;
+    --x-color: #2fd8a8;
+    --x-dim: #1a4a3f;
+    --y-color: #f5a83c;
+    --y-dim: #4a3a1a;
+    --neg: #ef5f6f;
+    --pos: #2fd8a8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Mono', monospace;
+    padding:28px 16px 60px;
+  }
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    font-size:clamp(22px,5vw,34px);
+    margin:0 0 4px;
+    text-align:center;
+  }
+  .subtitle{
+    text-align:center;
+    color:var(--muted);
+    font-size:12.5px;
+    margin-bottom:28px;
+    letter-spacing:0.03em;
+  }
+  .board{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    max-width:1200px;
+    margin:0 auto;
+  }
+  @media (max-width:880px){ .board{grid-template-columns:1fr;} }
+
+  .division{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .division-head{
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--line);
+  }
+  .division.x .division-head{ border-top:3px solid var(--x-color); }
+  .division.y .division-head{ border-top:3px solid var(--y-color); }
+  .division-title{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    font-size:15px;
+  }
+  .division.x .division-title{ color:var(--x-color); }
+  .division.y .division-title{ color:var(--y-color); }
+  .division-range{ color:var(--muted); font-size:11px; }
+
+  .table-wrap{
+    overflow-x:auto;
+    cursor:grab;
+    scrollbar-width:thin;
+    scrollbar-color:var(--x-color) var(--panel-2);
+  }
+  .table-wrap.dragging{ cursor:grabbing; user-select:none; }
+  .table-wrap::-webkit-scrollbar{ height:10px; }
+  .table-wrap::-webkit-scrollbar-track{ background:var(--panel-2); border-radius:6px; }
+  .table-wrap::-webkit-scrollbar-thumb{ background:var(--line); border-radius:6px; }
+  .division.x .table-wrap::-webkit-scrollbar-thumb{ background:var(--x-dim); }
+  .division.y .table-wrap::-webkit-scrollbar-thumb{ background:var(--y-dim); }
+  .table-wrap::-webkit-scrollbar-thumb:hover{ background:var(--x-color); }
+  table{ border-collapse:collapse; width:100%; font-size:12.5px; }
+  th,td{ padding:8px 10px; text-align:center; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th{
+    color:var(--muted);
+    font-weight:500;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    position:sticky; top:0; background:var(--panel);
+  }
+  td.name{
+    text-align:left; font-weight:600; min-width:110px;
+    position:sticky; left:34px; z-index:2; background:var(--panel);
+    box-shadow:2px 0 4px rgba(0,0,0,0.35);
+  }
+  td.rank{
+    font-family:'Oswald',sans-serif; font-weight:700; color:var(--muted); width:34px;
+    position:sticky; left:0; z-index:2; background:var(--panel);
+  }
+  th.rank-h{ position:sticky; left:0; top:0; z-index:5; background:var(--panel); }
+  th.name-h{
+    position:sticky; left:34px; top:0; z-index:5; background:var(--panel);
+    box-shadow:2px 0 4px rgba(0,0,0,0.35);
+  }
+  tr.top1 td.rank{ color:#ffd35c; }
+  tr.top2 td.rank{ color:#cfd6e0; }
+  tr.top3 td.rank{ color:#d99a5c; }
+  td.total{ font-weight:700; }
+  .row-btns{ display:flex; gap:4px; justify-content:center; }
+  input.score{
+    width:46px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:5px;
+    color:var(--text);
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:4px 2px;
+  }
+  input.score:focus{ outline:1px solid var(--x-color); }
+  .val-pos{ color:var(--pos); }
+  .val-neg{ color:var(--neg); }
+  .tiebadge{
+    display:inline-block;
+    margin-left:6px;
+    font-size:9.5px;
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:1px 5px;
+  }
+  .row-actions{ padding:10px 16px; display:flex; gap:8px; border-top:1px solid var(--line); flex-wrap:wrap; }
+  button{
+    background:var(--panel-2);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:7px 12px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    cursor:pointer;
+  }
+  button:hover{ border-color:var(--x-color); }
+  .division.y button:hover{ border-color:var(--y-color); }
+  button.danger:hover{ border-color:var(--neg); }
+  .global-actions{
+    max-width:1200px; margin:16px auto 0;
+    display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+  }
+  .del-x-btn{ background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px; }
+  .del-x-btn:hover{ color:var(--neg); }
+  .empty-hint{ padding:16px; color:var(--muted); font-size:12px; text-align:center; }
+  .rules-note{
+    max-width:1200px; margin:26px auto 0; color:var(--muted); font-size:11px;
+    border-top:1px dashed var(--line); padding-top:14px; line-height:1.6;
+  }
+
+  .paste-panel{
+    max-width:1200px; margin:0 auto 22px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px;
+  }
+  .paste-title{
+    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.05em; font-size:13px; margin-bottom:4px;
+  }
+  .paste-hint{ color:var(--muted); font-size:11px; margin-bottom:10px; }
+  #paste-area{
+    width:100%; min-height:90px; resize:vertical;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+    color:var(--text); font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    padding:10px; line-height:1.6;
+  }
+  .paste-actions{ margin-top:10px; display:flex; gap:8px; }
+
+  .pending-panel{
+    max-width:1200px; margin:0 auto 22px;
+    background:var(--panel); border:1px solid var(--y-color); border-radius:10px;
+    padding:14px 16px;
+  }
+  .pending-title{
+    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.05em; font-size:13px; margin-bottom:10px; color:var(--y-color);
+  }
+  .pending-row{
+    display:flex; align-items:center; gap:10px; padding:6px 0;
+    border-bottom:1px solid var(--line); font-size:12.5px;
+  }
+  .pending-row .pname{ flex:1; font-weight:600; }
+  .pending-row .pval{ width:50px; text-align:right; }
+  .pending-row .pval.val-pos{ color:var(--pos); }
+  .pending-row .pval.val-neg{ color:var(--neg); }
+  .pending-row select{
+    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
+    border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:4px 6px;
+  }
+  .pending-row .tag-known{ color:var(--muted); font-size:11px; width:78px; }
+  .pending-actions{ margin-top:12px; display:flex; gap:8px; }
+
+  .summary-panel{
+    max-width:1200px; margin:0 auto 22px;
+    background:var(--panel); border:1px solid var(--x-color); border-radius:10px;
+    padding:14px 16px;
+  }
+  .summary-title{
+    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.05em; font-size:13px; margin-bottom:4px; color:var(--x-color);
+  }
+  .summary-hint{ color:var(--muted); font-size:11px; margin-bottom:10px; }
+  .summary-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .summary-row select{
+    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
+    border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:6px 8px;
+  }
+  #summary-output{
+    width:100%; min-height:220px; resize:vertical;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+    color:var(--text); font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    padding:10px; line-height:1.6; white-space:pre-wrap;
+  }
+  .copy-flash{ color:var(--pos) !important; }
+</style>
+</head>
+<body>
+
+<h1>Ranking Geral</h1>
+<div class="subtitle">Faixa X (0 – 19.999M) · Faixa Y (20M ou mais) · maior pontuação vence, desempate pelo dia mais recente</div>
+<div class="subtitle" style="margin-top:-20px;font-size:11px;">status: <span id="sync-status">carregando...</span></div>
+
+<div class="paste-panel">
+  <div class="paste-title">Colar pontuação do dia</div>
+  <div class="paste-hint">Um participante por linha: <strong>Nome</strong> e <strong>pontuação</strong> separados por espaço ou tab. Nomes já cadastrados são reconhecidos e ligados direto à faixa em que estão; nomes novos você aloca abaixo antes de confirmar.</div>
+  <textarea id="paste-area" placeholder="João 8&#10;Maria -1&#10;Pedro -1"></textarea>
+  <div class="paste-actions">
+    <button onclick="processPaste()">Ler colagem</button>
+  </div>
+</div>
+
+<div class="pending-panel" id="pending-panel" style="display:none;">
+  <div class="pending-title">Confirmar alocação do novo dia</div>
+  <div id="pending-list"></div>
+  <div class="pending-actions">
+    <button onclick="confirmImport()">Lançar dia</button>
+    <button class="danger" onclick="cancelImport()">Cancelar</button>
+  </div>
+</div>
+
+<div class="summary-panel">
+  <div class="summary-title">Resumir dia / acumulado</div>
+  <div class="summary-hint">Gera o texto pronto pra postar, no mesmo estilo que você já usa.</div>
+  <div class="summary-row">
+    <label>Dia: <select id="summary-day"></select></label>
+    <button onclick="generateSummary()">Gerar resumo</button>
+    <button onclick="copySummary()" id="copy-btn">Copiar</button>
+  </div>
+  <textarea id="summary-output" readonly placeholder="O texto aparece aqui depois de clicar em Gerar resumo..."></textarea>
+</div>
+
+<div class="board">
+  <div class="division x" id="div-x">
+    <div class="division-head">
+      <div>
+        <div class="division-title">Faixa X</div>
+        <div class="division-range">0 a 19.999M</div>
+      </div>
+    </div>
+    <div class="table-wrap"><table><thead><tr id="head-x"></tr></thead><tbody id="body-x"></tbody></table></div>
+    <div class="empty-hint" id="empty-x" style="display:none;">Nenhum participante ainda.</div>
+    <div class="row-actions">
+      <button onclick="addParticipant('x')">+ Participante</button>
+      <button onclick="addDay()">+ Dia</button>
+    </div>
+  </div>
+
+  <div class="division y" id="div-y">
+    <div class="division-head">
+      <div>
+        <div class="division-title">Faixa Y</div>
+        <div class="division-range">20M ou mais</div>
+      </div>
+    </div>
+    <div class="table-wrap"><table><thead><tr id="head-y"></tr></thead><tbody id="body-y"></tbody></table></div>
+    <div class="empty-hint" id="empty-y" style="display:none;">Nenhum participante ainda.</div>
+    <div class="row-actions">
+      <button onclick="addParticipant('y')">+ Participante</button>
+      <button onclick="addDay()">+ Dia</button>
+    </div>
+  </div>
+</div>
+
+<div class="global-actions">
+  <button onclick="removeLastDay()">− Remover último dia</button>
+  <button class="danger" onclick="resetAll()">Limpar tudo</button>
+</div>
+
+<div class="rules-note">
+  Regras aplicadas: ganho máximo diário +10 · critério 1 — maior pontuação acumulada · critério 2+ — compara o resultado do dia mais recente e retrocede um dia por vez até achar diferença · 0 > -1 > -2, um -2 nunca fica acima de um -1 no mesmo dia comparado.
+</div>
+
+<script>
+const DEFAULT_DAYS = 7;
+const DEFAULT_X_NAMES = [
+  'Gov.br', 'COVKHOZ', 'KFS empreendimentos', 'Supermercado rede compras',
+  'Trevisan Ltda', 'Leds eletricks', 'VantrexCorp', 'ESTIVA BRASIL',
+  'Picleneudas', 'Golden Excellence', 'lobo de wall street', 'Raio de Sol'
+];
+const DEFAULT_Y_NAMES = [
+  'KODAK Co', 'MEGAFONE', 'Brazil Recicle', 'VSV EMPREENDIMENTOS Corp',
+  'Mansant Ltd', 'THE REALES', 'Jotas Ltda.', 'RussiCo Ltd',
+  'Vertice Aeroespacial', 'Grupo Astro SA', 'Fluent corporation', 'City06',
+  'Fazendas Bassi S.A', 'GRUPO EVER CORP', 'Raystem rr Corp', 'GLASSTOMIC', 'FLX BRAZIL'
+];
+
+function buildDefaultState(){
+  return {
+    days: DEFAULT_DAYS,
+    x: DEFAULT_X_NAMES.map(name => ({ name, scores: Array(DEFAULT_DAYS).fill(null) })),
+    y: DEFAULT_Y_NAMES.map(name => ({ name, scores: Array(DEFAULT_DAYS).fill(null) }))
+  };
+}
+
+let state = buildDefaultState();
+let loaded = false;
+let pendingImport = null;
+
+function scoreTag(v){
+  const n = v ?? 0;
+  return n >= 0 ? `+${n}` : `${n}`;
+}
+
+function ptsTag(v){
+  const abs = Math.abs(v);
+  return `${v} ${abs === 1 ? 'pt' : 'pts'}`;
+}
+
+function rankDivisionForDay(div, dayIdx){
+  const list = state[div].filter(p => p.scores[dayIdx] !== null && p.scores[dayIdx] !== undefined);
+  list.sort((a,b)=>{
+    const av = a.scores[dayIdx] ?? 0;
+    const bv = b.scores[dayIdx] ?? 0;
+    if(bv !== av) return bv - av;
+    return a.name.localeCompare(b.name, 'pt-BR');
+  });
+  return list;
+}
+
+function buildDivisionBlock(title, range, emoji, entries, formatFn){
+  let out = `━━━━━━━━━━━━━━━━━━ \n${emoji} ${title} • ${range}\n━━━━━━━━━━━━━━━━━━\n\n`;
+  out += entries.map((e, i) => `${i+1}° ${e.name} — ${formatFn(e)}`).join('\n\n');
+  return out;
+}
+
+function populateDaySelect(){
+  const sel = document.getElementById('summary-day');
+  sel.innerHTML = '';
+  for(let d = 0; d < state.days; d++){
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = `Dia ${d+1}`;
+    sel.appendChild(opt);
+  }
+  if(state.days > 0) sel.value = state.days - 1;
+}
+
+function generateSummary(){
+  if(state.days === 0){ alert('Cadastre pelo menos um dia primeiro.'); return; }
+  const dayIdx = parseInt(document.getElementById('summary-day').value, 10);
+
+  const xDay = rankDivisionForDay('x', dayIdx);
+  const yDay = rankDivisionForDay('y', dayIdx);
+  const xAcc = sortDivision('x');
+  const yAcc = sortDivision('y');
+
+  let text = `🏆 RANKING DIA ${dayIdx+1}\n\n`;
+  text += buildDivisionBlock('FAIXA X', '0 ~ 19.999M', '📗', xDay, e => scoreTag(e.scores[dayIdx]));
+  text += '\n\n';
+  text += buildDivisionBlock('FAIXA Y', '20M ~ ∞', '📘', yDay, e => scoreTag(e.scores[dayIdx]));
+  text += '\n\n🏆 RANKING ACUMULADO\n\n';
+  text += buildDivisionBlock('FAIXA X', '0 ~ 19.999M', '📗', xAcc, e => ptsTag(e.total));
+  text += '\n\n';
+  text += buildDivisionBlock('FAIXA Y', '20M ~ ∞', '📘', yAcc, e => ptsTag(e.total));
+
+  document.getElementById('summary-output').value = text;
+}
+
+function copySummary(){
+  const el = document.getElementById('summary-output');
+  if(!el.value){ generateSummary(); }
+  el.select();
+  const btn = document.getElementById('copy-btn');
+  const finish = () => {
+    const old = btn.textContent;
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copy-flash');
+    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('copy-flash'); }, 1500);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(el.value).then(finish).catch(()=>{ document.execCommand('copy'); finish(); });
+  } else {
+    document.execCommand('copy'); finish();
+  }
+}
+
+function findDivision(name){
+  const norm = name.toLowerCase();
+  if(state.x.some(p=>p.name.toLowerCase()===norm)) return 'x';
+  if(state.y.some(p=>p.name.toLowerCase()===norm)) return 'y';
+  return null;
+}
+
+function processPaste(){
+  const text = document.getElementById('paste-area').value;
+  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  const parsed = [];
+  for(const line of lines){
+    const m = line.match(/^(.*\S)[\s\t]+(-?\d+(?:[.,]\d+)?)$/);
+    if(!m) continue;
+    const value = parseFloat(m[2].replace(',', '.'));
+    if(isNaN(value)) continue;
+    parsed.push({ name: m[1].trim(), value: Math.min(value, 10) });
+  }
+  if(!parsed.length){
+    alert('Não consegui ler nenhuma linha. Formato esperado: Nome  Pontuação (um por linha).');
+    return;
+  }
+  pendingImport = parsed.map(e => ({ ...e, div: findDivision(e.name) }));
+  renderPending();
+}
+
+function renderPending(){
+  const panel = document.getElementById('pending-panel');
+  const list = document.getElementById('pending-list');
+  if(!pendingImport || !pendingImport.length){ panel.style.display='none'; return; }
+  panel.style.display = 'block';
+  list.innerHTML = pendingImport.map((e, i)=>{
+    const valClass = e.value < 0 ? 'val-neg' : e.value > 0 ? 'val-pos' : '';
+    const allocator = e.div
+      ? `<span class="tag-known">${e.div === 'x' ? 'Faixa X (já cadastrado)' : 'Faixa Y (já cadastrado)'}</span>`
+      : `<select onchange="pendingImport[${i}].div=this.value">
+           <option value="x">Faixa X</option>
+           <option value="y">Faixa Y</option>
+         </select>`;
+    return `<div class="pending-row">
+      <span class="pname">${e.name}</span>
+      <span class="pval ${valClass}">${e.value}</span>
+      ${allocator}
+    </div>`;
+  }).join('');
+}
+
+function cancelImport(){
+  pendingImport = null;
+  document.getElementById('pending-panel').style.display = 'none';
+}
+
+function confirmImport(){
+  if(!pendingImport || !pendingImport.length) return;
+  state.days += 1;
+  state.x.forEach(p=>p.scores.push(null));
+  state.y.forEach(p=>p.scores.push(null));
+  const newIdx = state.days - 1;
+
+  pendingImport.forEach(e=>{
+    const div = e.div || 'x';
+    const list = state[div];
+    let p = list.find(pp => pp.name.toLowerCase() === e.name.toLowerCase());
+    if(!p){
+      p = { name: e.name, scores: Array(state.days).fill(null) };
+      list.push(p);
+    }
+    p.scores[newIdx] = e.value;
+  });
+
+  pendingImport = null;
+  document.getElementById('pending-panel').style.display = 'none';
+  document.getElementById('paste-area').value = '';
+  saveState(); render();
+}
+
+const STORAGE_KEY="ranking-state";
+
+/* ======================================================================
+   ARMAZENAMENTO EM SERVIDOR GRATUITO (JSONBin.io)
+   1) Crie uma conta grátis em https://jsonbin.io
+   2) Em "API Keys" copie sua X-MASTER-KEY e cole abaixo em JSONBIN_KEY
+   3) Crie um Bin novo (pode salvar {} como conteúdo inicial) e copie o
+      Bin ID da URL do painel, colando abaixo em JSONBIN_ID
+   O localStorage continua sendo usado apenas como cópia de segurança
+   local, caso o site fique sem internet ou o servidor esteja fora do ar.
+   ====================================================================== */
+const JSONBIN_ID  = "COLOQUE_SEU_BIN_ID_AQUI";
+const JSONBIN_KEY = "COLOQUE_SUA_MASTER_KEY_AQUI";
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+
+function setStatus(text){
+  const el = document.getElementById('sync-status');
+  if(el) el.textContent = text;
+}
+
+async function loadState(){
+  setStatus('carregando do servidor...');
+  try{
+    const res = await fetch(`${JSONBIN_URL}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    const parsed = data.record;
+    if(parsed && typeof parsed.days === "number" && Array.isArray(parsed.x) && Array.isArray(parsed.y)){
+      state = parsed;
+    }
+    setStatus('sincronizado ✓');
+  }catch(e){
+    console.error("Erro ao carregar do servidor", e);
+    try{
+      const cached = localStorage.getItem(STORAGE_KEY);
+      if(cached){
+        const parsed = JSON.parse(cached);
+        if(parsed && typeof parsed.days === "number" && Array.isArray(parsed.x) && Array.isArray(parsed.y)) state = parsed;
+      }
+    }catch(e2){console.error("Erro ao carregar cópia local", e2);}
+    setStatus('offline — usando cópia local salva neste navegador');
+  }
+  loaded = true;
+  render();
+}
+
+let saveTimeout = null;
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ console.error("Erro ao salvar cópia local", e); }
+
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(syncToServer, 700);
+}
+
+async function syncToServer(){
+  setStatus('salvando...');
+  try{
+    const res = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_KEY
+      },
+      body: JSON.stringify(state)
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    setStatus('sincronizado ✓');
+  }catch(e){
+    console.error("Erro ao salvar no servidor", e);
+    setStatus('erro ao sincronizar (dado salvo só neste navegador)');
+  }
+}
+
+function addParticipant(div){
+  const name = prompt('Nome do participante:');
+  if(!name) return;
+  const list = state[div];
+  list.push({ name: name.trim(), scores: Array(state.days).fill(null) });
+  saveState(); render();
+}
+
+function removeParticipant(div, idx){
+  state[div].splice(idx,1);
+  saveState(); render();
+}
+
+function renameParticipant(div, idx){
+  const current = state[div][idx].name;
+  const name = prompt('Novo nome:', current);
+  if(!name || !name.trim() || name.trim() === current) return;
+  state[div][idx].name = name.trim();
+  saveState(); render();
+}
+
+function addDay(){
+  state.days += 1;
+  state.x.forEach(p=>p.scores.push(null));
+  state.y.forEach(p=>p.scores.push(null));
+  saveState(); render();
+}
+
+function removeLastDay(){
+  if(state.days === 0) return;
+  state.days -= 1;
+  state.x.forEach(p=>p.scores.pop());
+  state.y.forEach(p=>p.scores.pop());
+  saveState(); render();
+}
+
+function resetAll(){
+  if(!confirm('Apagar todos os participantes e dias?')) return;
+  state = { days: 0, x: [], y: [] };
+  saveState(); render();
+}
+
+function updateScore(div, idx, dayIdx, value){
+  let v = value.trim();
+  let num = v === '' ? null : parseFloat(v);
+  if(num !== null && isNaN(num)) num = null;
+  if(num !== null && num > 10) num = 10; // ganho máximo diário
+  state[div][idx].scores[dayIdx] = num;
+  saveState();
+  renderDivision(div); // re-sort without full redraw of inputs elsewhere
+}
+
+function total(p){
+  return p.scores.reduce((s,v)=> s + (v ?? 0), 0);
+}
+
+// devolve o índice do dia (mais recente -> mais antigo) que decide o empate, ou null se total já difere ou segue empatado
+function tiebreakDay(a,b){
+  for(let d=state.days-1; d>=0; d--){
+    const av = a.scores[d] ?? 0;
+    const bv = b.scores[d] ?? 0;
+    if(av !== bv) return d;
+  }
+  return null;
+}
+
+function sortDivision(div){
+  const list = state[div].map((p,i)=>({...p, idx:i, total: total(p)}));
+  list.sort((a,b)=>{
+    if(b.total !== a.total) return b.total - a.total;
+    const d = tiebreakDay(a,b);
+    if(d === null) return 0;
+    return (b.scores[d] ?? 0) - (a.scores[d] ?? 0);
+  });
+  return list;
+}
+
+function renderDivision(div){
+  const head = document.getElementById('head-'+div);
+  const body = document.getElementById('body-'+div);
+  const empty = document.getElementById('empty-'+div);
+
+  let headHtml = '<th class="rank-h">#</th><th class="name-h" style="text-align:left;">Nome</th>';
+  for(let d=0; d<state.days; d++) headHtml += `<th>D${d+1}</th>`;
+  headHtml += '<th>Total</th><th></th>';
+  head.innerHTML = headHtml;
+
+  const sorted = sortDivision(div);
+  empty.style.display = sorted.length ? 'none' : 'block';
+
+  body.innerHTML = sorted.map((p, rank)=>{
+    const rankClass = rank===0?'top1':rank===1?'top2':rank===2?'top3':'';
+    let cells = '';
+    for(let d=0; d<state.days; d++){
+      const val = p.scores[d];
+      const cls = val === null ? '' : (val < 0 ? 'val-neg' : val > 0 ? 'val-pos' : '');
+      cells += `<td><input class="score ${cls}" type="text" inputmode="numeric" pattern="-?[0-9]*"
+        value="${val === null ? '' : val}"
+        onchange="updateScore('${div}', ${p.idx}, ${d}, this.value)"></td>`;
+    }
+    let tieTag = '';
+    if(rank < sorted.length - 1){
+      const next = sorted[rank+1];
+      if(next.total === p.total){
+        const d = tiebreakDay(p, next);
+        if(d !== null) tieTag = `<span class="tiebadge">desempate D${d+1}</span>`;
+      }
+    }
+    return `<tr class="${rankClass}">
+      <td class="rank">${rank+1}</td>
+      <td class="name">${p.name}${tieTag}</td>
+      ${cells}
+      <td class="total">${p.total}</td>
+      <td><div class="row-btns">
+        <button class="del-x-btn" onclick="renameParticipant('${div}', ${p.idx})" title="Renomear">✎</button>
+        <button class="del-x-btn" onclick="removeParticipant('${div}', ${p.idx})" title="Remover">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function render(){
+  if(!loaded) return;
+  renderDivision('x');
+  renderDivision('y');
+  populateDaySelect();
+  bindDragScroll();
+}
+
+function enableDragScroll(el){
+  if(!el || el.dataset.dragBound) return;
+  el.dataset.dragBound = '1';
+  let isDown = false, startX = 0, startScroll = 0;
+  el.addEventListener('mousedown', (e)=>{
+    isDown = true;
+    el.classList.add('dragging');
+    startX = e.pageX;
+    startScroll = el.scrollLeft;
+  });
+  window.addEventListener('mouseup', ()=>{ isDown = false; el.classList.remove('dragging'); });
+  window.addEventListener('mousemove', (e)=>{
+    if(!isDown) return;
+    e.preventDefault();
+    el.scrollLeft = startScroll - (e.pageX - startX);
+  });
+}
+
+function bindDragScroll(){
+  document.querySelectorAll('.table-wrap').forEach(enableDragScroll);
+}
+
+window.addEventListener('beforeunload',saveState);
+window.addEventListener('pagehide',saveState);
+window.addEventListener('blur',saveState);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveState();});
+loadState();
+</script>
+</body>
+</html>
