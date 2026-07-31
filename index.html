@@ -11,6 +11,7 @@
     --bg: #12161d;
     --panel: #1a2029;
     --panel-2: #212938;
+    --panel-3: #262f40;
     --line: #2a3242;
     --text: #e7ecf2;
     --muted: #8892a3;
@@ -27,8 +28,11 @@
     background:var(--bg);
     color:var(--text);
     font-family:'IBM Plex Mono', monospace;
-    padding:28px 16px 60px;
+    padding:24px 16px 60px;
   }
+  :focus-visible{ outline:2px solid var(--x-color); outline-offset:2px; }
+
+  .top{ max-width:1200px; margin:0 auto 22px; text-align:center; }
   h1{
     font-family:'Oswald',sans-serif;
     font-weight:700;
@@ -36,21 +40,137 @@
     letter-spacing:0.06em;
     font-size:clamp(22px,5vw,34px);
     margin:0 0 4px;
-    text-align:center;
   }
-  .subtitle{
-    text-align:center;
-    color:var(--muted);
-    font-size:12.5px;
-    margin-bottom:28px;
-    letter-spacing:0.03em;
+  .subtitle{ color:var(--muted); font-size:12.5px; letter-spacing:0.03em; }
+  .status-line{
+    margin-top:8px; font-size:11px; color:var(--muted);
+    display:inline-flex; align-items:center; gap:6px;
   }
+  .status-dot{ width:7px; height:7px; border-radius:50%; background:var(--x-color); display:inline-block; }
+
+  /* ---------- Painéis genéricos ---------- */
+  .panel{
+    max-width:1200px; margin:0 auto 20px;
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:18px 20px;
+  }
+  .panel.accent-x{ border-top:3px solid var(--x-color); }
+  .panel.accent-y{ border-top:3px solid var(--y-color); }
+  .panel-title{
+    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.05em; font-size:14.5px; margin-bottom:4px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+  .panel-title .day-tag{
+    font-family:'IBM Plex Mono', monospace; text-transform:none; letter-spacing:0;
+    font-weight:500; font-size:11.5px; color:var(--muted);
+    background:var(--panel-2); border:1px solid var(--line); border-radius:20px; padding:2px 10px;
+  }
+  .panel-hint{ color:var(--muted); font-size:11.5px; margin-bottom:14px; line-height:1.55; }
+
+  /* ---------- Lançar dia: abas ---------- */
+  .launch-tabs{ display:flex; gap:6px; margin-bottom:16px; }
+  .launch-tab{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
+    padding:8px 14px; border-radius:8px; font-family:'IBM Plex Mono', monospace;
+    font-size:12px; font-weight:600; cursor:pointer;
+  }
+  .launch-tab.active{ color:var(--text); border-color:var(--x-color); background:rgba(47,216,168,0.10); }
+  .launch-tab:hover{ border-color:var(--x-color); }
+
+  .launch-columns{ display:grid; grid-template-columns:1fr 1fr; gap:26px; }
+  @media (max-width:760px){ .launch-columns{ grid-template-columns:1fr; gap:20px; } }
+
+  .launch-col-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:6px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .launch-col-title{
+    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
+    font-size:12.5px; letter-spacing:0.05em;
+  }
+  .launch-col.x .launch-col-title{ color:var(--x-color); }
+  .launch-col.y .launch-col-title{ color:var(--y-color); }
+  .launch-col-count{ color:var(--muted); font-size:10.5px; }
+
+  .launch-list{ max-height:400px; overflow-y:auto; padding-right:6px; scrollbar-width:thin; }
+  .launch-list::-webkit-scrollbar{ width:8px; }
+  .launch-list::-webkit-scrollbar-track{ background:transparent; }
+  .launch-list::-webkit-scrollbar-thumb{ background:var(--line); border-radius:6px; }
+
+  .launch-row{
+    display:flex; align-items:center; gap:10px; padding:7px 0;
+    border-bottom:1px solid var(--line); font-size:12.5px;
+  }
+  .launch-row:last-child{ border-bottom:none; }
+  .launch-name{ flex:1; font-weight:600; }
+  .launch-input{
+    width:66px; background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+    color:var(--text); text-align:center; font-family:'IBM Plex Mono', monospace; font-size:13px;
+    padding:7px 4px;
+  }
+  .launch-input:focus{ outline:1px solid var(--x-color); }
+  .launch-input.val-pos{ color:var(--pos); border-color:var(--x-dim); }
+  .launch-input.val-neg{ color:var(--neg); border-color:#4a2229; }
+
+  .launch-row-new{ padding-top:8px; }
+  .launch-name-input{
+    flex:1; min-width:0; background:var(--panel-2); border:1px dashed var(--line); border-radius:6px;
+    color:var(--text); font-family:'IBM Plex Mono', monospace; font-size:12.5px; padding:7px 9px;
+  }
+  .launch-add-row{ margin-top:10px; }
+  .launch-add-row button{ font-size:11px; padding:6px 10px; }
+
+  .launch-footer{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-top:18px; padding-top:14px; border-top:1px dashed var(--line); flex-wrap:wrap;
+  }
+  .launch-progress{ color:var(--muted); font-size:11.5px; }
+  .launch-submit{
+    background:var(--x-color); color:#0b1310; border:1px solid var(--x-color); font-weight:700;
+    padding:10px 22px; border-radius:8px; font-size:12.5px; letter-spacing:0.03em; cursor:pointer;
+  }
+  .launch-submit:hover{ filter:brightness(1.08); }
+
+  /* ---------- Colar ---------- */
+  #paste-area{
+    width:100%; min-height:100px; resize:vertical;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+    color:var(--text); font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    padding:10px; line-height:1.6;
+  }
+  .paste-actions{ margin-top:10px; display:flex; gap:8px; }
+
+  .pending-panel{
+    margin-top:16px; background:var(--panel-2); border:1px solid var(--y-color); border-radius:10px;
+    padding:14px 16px;
+  }
+  .pending-title{
+    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.05em; font-size:13px; margin-bottom:10px; color:var(--y-color);
+  }
+  .pending-row{
+    display:flex; align-items:center; gap:10px; padding:6px 0;
+    border-bottom:1px solid var(--line); font-size:12.5px;
+  }
+  .pending-row .pname{ flex:1; font-weight:600; }
+  .pending-row .pval{ width:50px; text-align:right; }
+  .pending-row .pval.val-pos{ color:var(--pos); }
+  .pending-row .pval.val-neg{ color:var(--neg); }
+  .pending-row select{
+    background:var(--panel-3); color:var(--text); border:1px solid var(--line);
+    border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:4px 6px;
+  }
+  .pending-row .tag-known{ color:var(--muted); font-size:11px; width:100px; text-align:right; }
+  .pending-actions{ margin-top:12px; display:flex; gap:8px; }
+
+  /* ---------- Board de ranking ---------- */
   .board{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:20px;
     max-width:1200px;
-    margin:0 auto;
+    margin:0 auto 20px;
   }
   @media (max-width:880px){ .board{grid-template-columns:1fr;} }
 
@@ -103,11 +223,13 @@
     letter-spacing:0.04em;
     position:sticky; top:0; background:var(--panel);
   }
+  tbody tr:hover td{ background:var(--panel-2); }
   td.name{
     text-align:left; font-weight:600; min-width:110px;
     position:sticky; left:34px; z-index:2; background:var(--panel);
     box-shadow:2px 0 4px rgba(0,0,0,0.35);
   }
+  tbody tr:hover td.name, tbody tr:hover td.rank{ background:var(--panel-2); }
   td.rank{
     font-family:'Oswald',sans-serif; font-weight:700; color:var(--muted); width:34px;
     position:sticky; left:0; z-index:2; background:var(--panel);
@@ -120,6 +242,9 @@
   tr.top1 td.rank{ color:#ffd35c; }
   tr.top2 td.rank{ color:#cfd6e0; }
   tr.top3 td.rank{ color:#d99a5c; }
+  tr.top1 td.name::before{ content:'🥇 '; }
+  tr.top2 td.name::before{ content:'🥈 '; }
+  tr.top3 td.name::before{ content:'🥉 '; }
   td.total{ font-weight:700; }
   .row-btns{ display:flex; gap:4px; justify-content:center; }
   input.score{
@@ -171,105 +296,81 @@
     border-top:1px dashed var(--line); padding-top:14px; line-height:1.6;
   }
 
-  .paste-panel{
-    max-width:1200px; margin:0 auto 22px;
-    background:var(--panel); border:1px solid var(--line); border-radius:10px;
-    padding:14px 16px;
-  }
-  .paste-title{
-    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
-    letter-spacing:0.05em; font-size:13px; margin-bottom:4px;
-  }
-  .paste-hint{ color:var(--muted); font-size:11px; margin-bottom:10px; }
-  #paste-area{
-    width:100%; min-height:90px; resize:vertical;
-    background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
-    color:var(--text); font-family:'IBM Plex Mono', monospace; font-size:12.5px;
-    padding:10px; line-height:1.6;
-  }
-  .paste-actions{ margin-top:10px; display:flex; gap:8px; }
-
-  .pending-panel{
-    max-width:1200px; margin:0 auto 22px;
-    background:var(--panel); border:1px solid var(--y-color); border-radius:10px;
-    padding:14px 16px;
-  }
-  .pending-title{
-    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
-    letter-spacing:0.05em; font-size:13px; margin-bottom:10px; color:var(--y-color);
-  }
-  .pending-row{
-    display:flex; align-items:center; gap:10px; padding:6px 0;
-    border-bottom:1px solid var(--line); font-size:12.5px;
-  }
-  .pending-row .pname{ flex:1; font-weight:600; }
-  .pending-row .pval{ width:50px; text-align:right; }
-  .pending-row .pval.val-pos{ color:var(--pos); }
-  .pending-row .pval.val-neg{ color:var(--neg); }
-  .pending-row select{
-    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
-    border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:4px 6px;
-  }
-  .pending-row .tag-known{ color:var(--muted); font-size:11px; width:78px; }
-  .pending-actions{ margin-top:12px; display:flex; gap:8px; }
-
-  .summary-panel{
-    max-width:1200px; margin:0 auto 22px;
-    background:var(--panel); border:1px solid var(--x-color); border-radius:10px;
-    padding:14px 16px;
-  }
-  .summary-title{
-    font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase;
-    letter-spacing:0.05em; font-size:13px; margin-bottom:4px; color:var(--x-color);
-  }
-  .summary-hint{ color:var(--muted); font-size:11px; margin-bottom:10px; }
-  .summary-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  /* ---------- Resumo ---------- */
+  .summary-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .summary-row label{ font-size:12px; color:var(--muted); }
   .summary-row select{
     background:var(--panel-2); color:var(--text); border:1px solid var(--line);
     border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:6px 8px;
   }
   #summary-output{
-    width:100%; min-height:220px; resize:vertical;
+    width:100%; min-height:260px; resize:vertical;
     background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
     color:var(--text); font-family:'IBM Plex Mono', monospace; font-size:12.5px;
-    padding:10px; line-height:1.6; white-space:pre-wrap;
+    padding:12px; line-height:1.55; white-space:pre-wrap;
   }
-  .copy-flash{ color:var(--pos) !important; }
+  .copy-flash{ color:var(--pos) !important; border-color:var(--pos) !important; }
 </style>
 </head>
 <body>
 
-<h1>Ranking Geral</h1>
-<div class="subtitle">Faixa X (0 – 19.999M) · Faixa Y (20M ou mais) · maior pontuação vence, desempate pelo dia mais recente</div>
-<div class="subtitle" style="margin-top:-20px;font-size:11px;">status: <span id="sync-status">carregando...</span></div>
-
-<div class="paste-panel">
-  <div class="paste-title">Colar pontuação do dia</div>
-  <div class="paste-hint">Um participante por linha: <strong>Nome</strong> e <strong>pontuação</strong> separados por espaço ou tab. Nomes já cadastrados são reconhecidos e ligados direto à faixa em que estão; nomes novos você aloca abaixo antes de confirmar.</div>
-  <textarea id="paste-area" placeholder="João 8&#10;Maria -1&#10;Pedro -1"></textarea>
-  <div class="paste-actions">
-    <button onclick="processPaste()">Ler colagem</button>
-  </div>
+<div class="top">
+  <h1>Ranking Geral</h1>
+  <div class="subtitle">Faixa X (0 – 19.999M) · Faixa Y (20M ou mais) · maior pontuação vence, desempate pelo dia mais recente</div>
+  <div class="status-line"><span class="status-dot" id="status-dot"></span><span id="sync-status">carregando...</span></div>
 </div>
 
-<div class="pending-panel" id="pending-panel" style="display:none;">
-  <div class="pending-title">Confirmar alocação do novo dia</div>
-  <div id="pending-list"></div>
-  <div class="pending-actions">
-    <button onclick="confirmImport()">Lançar dia</button>
-    <button class="danger" onclick="cancelImport()">Cancelar</button>
-  </div>
-</div>
+<div class="panel accent-x launch-card">
+  <div class="panel-title">Lançar pontuação do dia <span class="day-tag" id="launch-day-label">Dia —</span></div>
+  <div class="panel-hint">Preencha a pontuação de cada participante para fechar o dia, ou cole os dados prontos de outra fonte.</div>
 
-<div class="summary-panel">
-  <div class="summary-title">Resumir dia / acumulado</div>
-  <div class="summary-hint">Gera o texto pronto pra postar, no mesmo estilo que você já usa.</div>
-  <div class="summary-row">
-    <label>Dia: <select id="summary-day"></select></label>
-    <button onclick="generateSummary()">Gerar resumo</button>
-    <button onclick="copySummary()" id="copy-btn">Copiar</button>
+  <div class="launch-tabs">
+    <button type="button" class="launch-tab active" id="tab-form" onclick="switchLaunchTab('form')">✏️ Preencher</button>
+    <button type="button" class="launch-tab" id="tab-paste" onclick="switchLaunchTab('paste')">📋 Colar</button>
   </div>
-  <textarea id="summary-output" readonly placeholder="O texto aparece aqui depois de clicar em Gerar resumo..."></textarea>
+
+  <div id="launch-view-form">
+    <div class="launch-columns">
+      <div class="launch-col x">
+        <div class="launch-col-head">
+          <span class="launch-col-title">Faixa X</span>
+          <span class="launch-col-count" id="launch-count-x"></span>
+        </div>
+        <div class="launch-list" id="launch-list-x"></div>
+        <div id="launch-new-x"></div>
+        <div class="launch-add-row"><button type="button" onclick="addDraftRow('x')">+ novo participante</button></div>
+      </div>
+      <div class="launch-col y">
+        <div class="launch-col-head">
+          <span class="launch-col-title">Faixa Y</span>
+          <span class="launch-col-count" id="launch-count-y"></span>
+        </div>
+        <div class="launch-list" id="launch-list-y"></div>
+        <div id="launch-new-y"></div>
+        <div class="launch-add-row"><button type="button" onclick="addDraftRow('y')">+ novo participante</button></div>
+      </div>
+    </div>
+    <div class="launch-footer">
+      <span class="launch-progress" id="launch-progress"></span>
+      <button type="button" class="launch-submit" id="launch-submit-btn" onclick="launchDayForm()">Lançar dia</button>
+    </div>
+  </div>
+
+  <div id="launch-view-paste" style="display:none;">
+    <div class="panel-hint" style="margin-top:0;">Um participante por linha: <strong>Nome</strong> e <strong>pontuação</strong> separados por espaço ou tab. Nomes já cadastrados são reconhecidos automaticamente e ligados direto à faixa em que estão; nomes novos você aloca abaixo antes de confirmar.</div>
+    <textarea id="paste-area" placeholder="João 8&#10;Maria -1&#10;Pedro -1"></textarea>
+    <div class="paste-actions">
+      <button onclick="processPaste()">Ler colagem</button>
+    </div>
+    <div class="pending-panel" id="pending-panel" style="display:none;">
+      <div class="pending-title">Confirmar alocação do novo dia</div>
+      <div id="pending-list"></div>
+      <div class="pending-actions">
+        <button onclick="confirmImport()">Lançar dia</button>
+        <button class="danger" onclick="cancelImport()">Cancelar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="board">
@@ -284,7 +385,7 @@
     <div class="empty-hint" id="empty-x" style="display:none;">Nenhum participante ainda.</div>
     <div class="row-actions">
       <button onclick="addParticipant('x')">+ Participante</button>
-      <button onclick="addDay()">+ Dia</button>
+      <button onclick="addDay()">+ Dia em branco</button>
     </div>
   </div>
 
@@ -299,9 +400,20 @@
     <div class="empty-hint" id="empty-y" style="display:none;">Nenhum participante ainda.</div>
     <div class="row-actions">
       <button onclick="addParticipant('y')">+ Participante</button>
-      <button onclick="addDay()">+ Dia</button>
+      <button onclick="addDay()">+ Dia em branco</button>
     </div>
   </div>
+</div>
+
+<div class="panel accent-y">
+  <div class="panel-title">Resumir dia / acumulado</div>
+  <div class="panel-hint">Gera o texto pronto pra postar, no mesmo formato que você já usa. Atualiza sozinho sempre que você lança um dia novo.</div>
+  <div class="summary-row">
+    <label>Dia: <select id="summary-day" onchange="generateSummary()"></select></label>
+    <button onclick="generateSummary()">Gerar resumo</button>
+    <button onclick="copySummary()" id="copy-btn">Copiar</button>
+  </div>
+  <textarea id="summary-output" readonly placeholder="O texto aparece aqui assim que houver ao menos um dia lançado..."></textarea>
 </div>
 
 <div class="global-actions">
@@ -339,6 +451,10 @@ let state = buildDefaultState();
 let loaded = false;
 let pendingImport = null;
 
+// rascunho (não salvo) do formulário de lançamento do dia
+let draft = { x:{}, y:{} };
+let draftNew = { x:[], y:[] };
+
 function scoreTag(v){
   const n = v ?? 0;
   return n >= 0 ? `+${n}` : `${n}`;
@@ -361,13 +477,15 @@ function rankDivisionForDay(div, dayIdx){
 }
 
 function buildDivisionBlock(title, range, emoji, entries, formatFn){
-  let out = `━━━━━━━━━━━━━━━━━━ \n${emoji} ${title} • ${range}\n━━━━━━━━━━━━━━━━━━\n\n`;
-  out += entries.map((e, i) => `${i+1}° ${e.name} — ${formatFn(e)}`).join('\n\n');
+  const bar = '━━━━━━━━━━━━━━━━━━';
+  let out = `${bar} \n${emoji} ${title} • ${range} \n${bar}\n`;
+  out += entries.map((e, i) => `${i+1}° ${e.name} — ${formatFn(e)}`).join('\n');
   return out;
 }
 
 function populateDaySelect(){
   const sel = document.getElementById('summary-day');
+  const prev = sel.value;
   sel.innerHTML = '';
   for(let d = 0; d < state.days; d++){
     const opt = document.createElement('option');
@@ -379,7 +497,8 @@ function populateDaySelect(){
 }
 
 function generateSummary(){
-  if(state.days === 0){ alert('Cadastre pelo menos um dia primeiro.'); return; }
+  const out = document.getElementById('summary-output');
+  if(state.days === 0){ out.value = ''; return; }
   const dayIdx = parseInt(document.getElementById('summary-day').value, 10);
 
   const xDay = rankDivisionForDay('x', dayIdx);
@@ -387,21 +506,22 @@ function generateSummary(){
   const xAcc = sortDivision('x');
   const yAcc = sortDivision('y');
 
-  let text = `🏆 RANKING DIA ${dayIdx+1}\n\n`;
+  let text = `🏆 RANKING DIA ${dayIdx+1}\n`;
   text += buildDivisionBlock('FAIXA X', '0 ~ 19.999M', '📗', xDay, e => scoreTag(e.scores[dayIdx]));
-  text += '\n\n';
+  text += '\n';
   text += buildDivisionBlock('FAIXA Y', '20M ~ ∞', '📘', yDay, e => scoreTag(e.scores[dayIdx]));
-  text += '\n\n🏆 RANKING ACUMULADO\n\n';
+  text += '\n🏆 RANKING ACUMULADO\n';
   text += buildDivisionBlock('FAIXA X', '0 ~ 19.999M', '📗', xAcc, e => ptsTag(e.total));
-  text += '\n\n';
+  text += '\n';
   text += buildDivisionBlock('FAIXA Y', '20M ~ ∞', '📘', yAcc, e => ptsTag(e.total));
 
-  document.getElementById('summary-output').value = text;
+  out.value = text;
 }
 
 function copySummary(){
   const el = document.getElementById('summary-output');
   if(!el.value){ generateSummary(); }
+  if(!el.value) return;
   el.select();
   const btn = document.getElementById('copy-btn');
   const finish = () => {
@@ -490,6 +610,7 @@ function confirmImport(){
   pendingImport = null;
   document.getElementById('pending-panel').style.display = 'none';
   document.getElementById('paste-area').value = '';
+  switchLaunchTab('form');
   saveState(); render();
 }
 
@@ -504,17 +625,19 @@ const STORAGE_KEY="ranking-state";
    O localStorage continua sendo usado apenas como cópia de segurança
    local, caso o site fique sem internet ou o servidor esteja fora do ar.
    ====================================================================== */
-const JSONBIN_ID  = "COLOQUE_SEU_BIN_ID_AQUI";
-const JSONBIN_KEY = "COLOQUE_SUA_MASTER_KEY_AQUI";
+const JSONBIN_ID  = "6a6c88a8f5f4af5e29d9b70d";
+const JSONBIN_KEY = "$2a$10$tJO4TeChfpvr8puMi4P1/eWqjnDKT13GfmtvUixO9MGyEzbS8jHgi";
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
 
-function setStatus(text){
+function setStatus(text, ok){
   const el = document.getElementById('sync-status');
   if(el) el.textContent = text;
+  const dot = document.getElementById('status-dot');
+  if(dot) dot.style.background = ok === false ? 'var(--neg)' : (ok === 'busy' ? 'var(--y-color)' : 'var(--x-color)');
 }
 
 async function loadState(){
-  setStatus('carregando do servidor...');
+  setStatus('carregando do servidor...', 'busy');
   try{
     const res = await fetch(`${JSONBIN_URL}/latest`, {
       headers: { 'X-Master-Key': JSONBIN_KEY }
@@ -525,7 +648,7 @@ async function loadState(){
     if(parsed && typeof parsed.days === "number" && Array.isArray(parsed.x) && Array.isArray(parsed.y)){
       state = parsed;
     }
-    setStatus('sincronizado ✓');
+    setStatus('sincronizado ✓', true);
   }catch(e){
     console.error("Erro ao carregar do servidor", e);
     try{
@@ -535,7 +658,7 @@ async function loadState(){
         if(parsed && typeof parsed.days === "number" && Array.isArray(parsed.x) && Array.isArray(parsed.y)) state = parsed;
       }
     }catch(e2){console.error("Erro ao carregar cópia local", e2);}
-    setStatus('offline — usando cópia local salva neste navegador');
+    setStatus('offline — usando cópia local salva neste navegador', false);
   }
   loaded = true;
   render();
@@ -551,7 +674,7 @@ function saveState(){
 }
 
 async function syncToServer(){
-  setStatus('salvando...');
+  setStatus('salvando...', 'busy');
   try{
     const res = await fetch(JSONBIN_URL, {
       method: 'PUT',
@@ -562,10 +685,10 @@ async function syncToServer(){
       body: JSON.stringify(state)
     });
     if(!res.ok) throw new Error('HTTP '+res.status);
-    setStatus('sincronizado ✓');
+    setStatus('sincronizado ✓', true);
   }catch(e){
     console.error("Erro ao salvar no servidor", e);
-    setStatus('erro ao sincronizar (dado salvo só neste navegador)');
+    setStatus('erro ao sincronizar (dado salvo só neste navegador)', false);
   }
 }
 
@@ -690,12 +813,175 @@ function renderDivision(div){
   }).join('');
 }
 
+/* ---------------------------------------------------------------------
+   Formulário de lançamento do dia (aba "Preencher")
+   --------------------------------------------------------------------- */
+
+function switchLaunchTab(tab){
+  const formView = document.getElementById('launch-view-form');
+  const pasteView = document.getElementById('launch-view-paste');
+  const tabForm = document.getElementById('tab-form');
+  const tabPaste = document.getElementById('tab-paste');
+  if(tab === 'paste'){
+    formView.style.display = 'none';
+    pasteView.style.display = '';
+    tabForm.classList.remove('active');
+    tabPaste.classList.add('active');
+  } else {
+    formView.style.display = '';
+    pasteView.style.display = 'none';
+    tabForm.classList.add('active');
+    tabPaste.classList.remove('active');
+  }
+}
+
+function updateLaunchDayLabel(){
+  const el = document.getElementById('launch-day-label');
+  if(el) el.textContent = `Dia ${state.days + 1}`;
+}
+
+function styleLaunchInput(el){
+  el.classList.remove('val-pos','val-neg');
+  const v = parseFloat(String(el.value).replace(',', '.'));
+  if(!isNaN(v)){
+    if(v > 0) el.classList.add('val-pos');
+    else if(v < 0) el.classList.add('val-neg');
+  }
+}
+
+function focusNextLaunch(el){
+  const all = Array.from(document.querySelectorAll('#launch-view-form input'));
+  const idx = all.indexOf(el);
+  if(idx > -1 && idx < all.length - 1) all[idx+1].focus();
+  else el.blur();
+}
+
+function updateLaunchProgress(){
+  let filled = 0, totalCount = 0;
+  ['x','y'].forEach(div=>{
+    state[div].forEach((p,i)=>{
+      totalCount++;
+      if(draft[div][i] !== undefined && draft[div][i] !== '') filled++;
+    });
+    draftNew[div].forEach(r=>{
+      if(r.name.trim()){ totalCount++; if(r.value !== '') filled++; }
+    });
+    const countEl = document.getElementById('launch-count-'+div);
+    if(countEl) countEl.textContent = `${state[div].length} cadastrado${state[div].length===1?'':'s'}`;
+  });
+  const el = document.getElementById('launch-progress');
+  if(el){
+    el.textContent = totalCount
+      ? `${filled} de ${totalCount} preenchidos`
+      : 'Nenhum participante cadastrado ainda — use "+ novo participante"';
+  }
+}
+
+function renderDraftNewRows(div){
+  const wrap = document.getElementById('launch-new-'+div);
+  if(!wrap) return;
+  wrap.innerHTML = draftNew[div].map((row,i)=>`
+    <div class="launch-row launch-row-new">
+      <input class="launch-name-input" type="text" placeholder="Novo participante"
+        value="${row.name}" oninput="draftNew.${div}[${i}].name=this.value; updateLaunchProgress();">
+      <input class="launch-input" type="text" inputmode="numeric" pattern="-?[0-9]*" placeholder="pts"
+        value="${row.value}"
+        oninput="draftNew.${div}[${i}].value=this.value; styleLaunchInput(this); updateLaunchProgress();"
+        onkeydown="if(event.key==='Enter'){event.preventDefault(); focusNextLaunch(this);}">
+      <button type="button" class="del-x-btn" onclick="removeDraftRow('${div}', ${i})" title="Remover">✕</button>
+    </div>
+  `).join('');
+}
+
+function addDraftRow(div){
+  draftNew[div].push({ name:'', value:'' });
+  renderDraftNewRows(div);
+  updateLaunchProgress();
+  requestAnimationFrame(()=>{
+    const wrap = document.getElementById('launch-new-'+div);
+    const inputs = wrap ? wrap.querySelectorAll('.launch-name-input') : [];
+    if(inputs.length) inputs[inputs.length-1].focus();
+  });
+}
+
+function removeDraftRow(div, idx){
+  draftNew[div].splice(idx,1);
+  renderDraftNewRows(div);
+  updateLaunchProgress();
+}
+
+function renderLaunchForm(){
+  draft = { x:{}, y:{} };
+  draftNew = { x:[], y:[] };
+  ['x','y'].forEach(div=>{
+    const listEl = document.getElementById('launch-list-'+div);
+    if(!listEl) return;
+    listEl.innerHTML = state[div].length
+      ? state[div].map((p,i)=>`
+        <div class="launch-row">
+          <span class="launch-name">${p.name}</span>
+          <input class="launch-input" type="text" inputmode="numeric" pattern="-?[0-9]*" placeholder="—"
+            oninput="draft.${div}[${i}]=this.value; styleLaunchInput(this); updateLaunchProgress();"
+            onkeydown="if(event.key==='Enter'){event.preventDefault(); focusNextLaunch(this);}"
+            onfocus="this.select()">
+        </div>
+      `).join('')
+      : '<div class="empty-hint" style="padding:8px 0;">Nenhum participante ainda.</div>';
+    renderDraftNewRows(div);
+  });
+  updateLaunchDayLabel();
+  updateLaunchProgress();
+}
+
+function launchDayForm(){
+  let hasAny = false;
+  ['x','y'].forEach(div=>{
+    if(Object.values(draft[div]).some(v => v !== undefined && v !== '')) hasAny = true;
+    if(draftNew[div].some(r => r.name.trim() && r.value !== '')) hasAny = true;
+  });
+  if(!hasAny){ alert('Preencha ao menos uma pontuação antes de lançar o dia.'); return; }
+
+  state.days += 1;
+  state.x.forEach(p=>p.scores.push(null));
+  state.y.forEach(p=>p.scores.push(null));
+  const newIdx = state.days - 1;
+
+  ['x','y'].forEach(div=>{
+    state[div].forEach((p,i)=>{
+      const raw = draft[div][i];
+      if(raw === undefined || raw === '') return;
+      let num = parseFloat(String(raw).replace(',', '.'));
+      if(isNaN(num)) return;
+      if(num > 10) num = 10;
+      p.scores[newIdx] = num;
+    });
+    draftNew[div].forEach(row=>{
+      const name = row.name.trim();
+      if(!name || row.value === '') return;
+      let num = parseFloat(String(row.value).replace(',', '.'));
+      if(isNaN(num)) return;
+      if(num > 10) num = 10;
+      let p = state[div].find(pp => pp.name.toLowerCase() === name.toLowerCase());
+      if(!p){
+        p = { name, scores: Array(state.days).fill(null) };
+        state[div].push(p);
+      }
+      p.scores[newIdx] = num;
+    });
+  });
+
+  saveState();
+  render();
+}
+
 function render(){
   if(!loaded) return;
   renderDivision('x');
   renderDivision('y');
   populateDaySelect();
+  renderLaunchForm();
   bindDragScroll();
+  generateSummary();
 }
 
 function enableDragScroll(el){
