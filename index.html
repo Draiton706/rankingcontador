@@ -68,6 +68,26 @@
   }
   .panel-hint{ color:var(--muted); font-size:11.5px; margin-bottom:14px; line-height:1.55; }
 
+  /* ---------- Painel Utilitário / Estatísticas ---------- */
+  .stats-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media (max-width: 760px){ .stats-grid{ grid-template-columns: 1fr; } }
+  .stat-card{
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-label{ font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-value{ font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600; color: var(--text); }
+
   /* ---------- Lançar dia: abas ---------- */
   .launch-tabs{ display:flex; gap:6px; margin-bottom:16px; }
   .launch-tab{
@@ -161,10 +181,20 @@
     background:var(--panel-3); color:var(--text); border:1px solid var(--line);
     border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:12px; padding:4px 6px;
   }
-  .pending-row .tag-known{ color:var(--muted); font-size:11px; width:100px; text-align:right; }
+  .pending-row .tag-known{ color:var(--muted); font-size:10.5px; min-width:76px; text-align:right; white-space:nowrap; }
   .pending-actions{ margin-top:12px; display:flex; gap:8px; }
+  .pending-controls{
+    display:flex; gap:18px; flex-wrap:wrap; align-items:center;
+    margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed var(--line);
+    font-size:12px; color:var(--muted);
+  }
+  .pending-controls select{
+    background:var(--panel-3); color:var(--text); border:1px solid var(--line);
+    border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:12px;
+    padding:5px 7px; margin-left:6px;
+  }
 
-  /* ---------- Board de ranking ---------- */
+  /* ---------- Board de ranking (Visualização) ---------- */
   .board{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -214,7 +244,7 @@
   .division.y .table-wrap::-webkit-scrollbar-thumb{ background:var(--y-dim); }
   .table-wrap::-webkit-scrollbar-thumb:hover{ background:var(--x-color); }
   table{ border-collapse:collapse; width:100%; font-size:12.5px; }
-  th,td{ padding:8px 10px; text-align:center; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th,td{ padding:10px 12px; text-align:center; border-bottom:1px solid var(--line); white-space:nowrap; }
   th{
     color:var(--muted);
     font-weight:500;
@@ -225,7 +255,7 @@
   }
   tbody tr:hover td{ background:var(--panel-2); }
   td.name{
-    text-align:left; font-weight:600; min-width:110px;
+    text-align:left; font-weight:600; min-width:130px;
     position:sticky; left:34px; z-index:2; background:var(--panel);
     box-shadow:2px 0 4px rgba(0,0,0,0.35);
   }
@@ -246,19 +276,6 @@
   tr.top2 td.name::before{ content:'🥈 '; }
   tr.top3 td.name::before{ content:'🥉 '; }
   td.total{ font-weight:700; }
-  .row-btns{ display:flex; gap:4px; justify-content:center; }
-  input.score{
-    width:46px;
-    background:var(--panel-2);
-    border:1px solid var(--line);
-    border-radius:5px;
-    color:var(--text);
-    text-align:center;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
-    padding:4px 2px;
-  }
-  input.score:focus{ outline:1px solid var(--x-color); }
   .val-pos{ color:var(--pos); }
   .val-neg{ color:var(--neg); }
   .tiebadge{
@@ -270,27 +287,7 @@
     border-radius:4px;
     padding:1px 5px;
   }
-  .row-actions{ padding:10px 16px; display:flex; gap:8px; border-top:1px solid var(--line); flex-wrap:wrap; }
-  button{
-    background:var(--panel-2);
-    color:var(--text);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:7px 12px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px;
-    cursor:pointer;
-  }
-  button:hover{ border-color:var(--x-color); }
-  .division.y button:hover{ border-color:var(--y-color); }
-  button.danger:hover{ border-color:var(--neg); }
-  .global-actions{
-    max-width:1200px; margin:16px auto 0;
-    display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
-  }
-  .del-x-btn{ background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px; }
-  .del-x-btn:hover{ color:var(--neg); }
-  .empty-hint{ padding:16px; color:var(--muted); font-size:12px; text-align:center; }
+  .empty-hint{ padding:20px; color:var(--muted); font-size:12px; text-align:center; }
   .rules-note{
     max-width:1200px; margin:26px auto 0; color:var(--muted); font-size:11px;
     border-top:1px dashed var(--line); padding-top:14px; line-height:1.6;
@@ -310,9 +307,158 @@
     padding:12px; line-height:1.55; white-space:pre-wrap;
   }
   .copy-flash{ color:var(--pos) !important; border-color:var(--pos) !important; }
+
+  /* ---------- Autenticação e cabeçalho do painel (multi-tenant) ---------- */
+  .hidden{ display:none !important; }
+
+  .auth-wrapper{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px;
+  }
+  .auth-card{ max-width:420px; width:100%; }
+  .auth-brand{ text-align:center; margin-bottom:18px; }
+  .auth-brand-title{
+    font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.06em; font-size:22px; margin:0 0 4px;
+  }
+  .auth-brand-sub{ color:var(--muted); font-size:11.5px; letter-spacing:0.02em; }
+  .auth-card .launch-tab{ flex:1; text-align:center; }
+  .auth-form{ display:flex; flex-direction:column; gap:14px; }
+  .auth-form .launch-submit{ width:100%; }
+  .launch-submit:disabled{ opacity:0.6; cursor:not-allowed; filter:none; }
+  .campo{ display:flex; flex-direction:column; gap:6px; font-size:11.5px; color:var(--muted); }
+  .campo input{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+    color:var(--text); font-family:'IBM Plex Mono', monospace; font-size:13px; padding:10px 11px;
+    width:100%;
+  }
+  .campo input:focus{ outline:1px solid var(--x-color); }
+  .auth-secondary{ align-self:center; color:var(--muted); font-size:11px; padding:7px 10px; }
+  .auth-msg{
+    margin-top:16px; padding:10px 12px; border-radius:8px; font-size:12px; line-height:1.5;
+    border:1px solid var(--line);
+  }
+  .auth-msg.ok{ border-color:var(--pos); color:var(--pos); background:rgba(47,216,168,0.08); }
+  .auth-msg.erro{ border-color:var(--neg); color:var(--neg); background:rgba(239,95,111,0.08); }
+
+  .dash-header{ background:var(--panel); border-bottom:1px solid var(--line); margin:-24px -16px 22px; }
+  .dash-header-inner{
+    max-width:1200px; margin:0 auto; padding:14px 16px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  }
+  .dash-brand{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .dash-brand-title{
+    font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.05em; font-size:14px;
+  }
+  .dash-group-name{
+    color:var(--muted); font-size:11.5px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:20px; padding:2px 10px;
+  }
+  .dash-user{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .dash-sheet-link{
+    background:var(--panel-2); color:var(--text); border:1px solid var(--line); border-radius:6px;
+    padding:7px 12px; font-family:'IBM Plex Mono', monospace; font-size:11.5px; text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .dash-sheet-link:hover{ border-color:var(--x-color); }
+  .dash-user-name{ color:var(--muted); font-size:11px; }
+  
+  button{
+    background:var(--panel-2); color:var(--text); border:1px solid var(--line);
+    border-radius:6px; padding:7px 12px; font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px; cursor:pointer;
+  }
+  button:hover{ border-color:var(--x-color); }
+  button.danger:hover{ border-color:var(--neg); }
+  .global-actions{
+    max-width:1200px; margin:16px auto 0;
+    display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+  }
 </style>
 </head>
 <body>
+
+<div id="tela-auth" class="auth-wrapper">
+  <div class="panel accent-x auth-card">
+    <div class="auth-brand">
+      <div class="auth-brand-title">Ranking Geral</div>
+      <div class="auth-brand-sub">Faixa X · Faixa Y — acesse o painel do seu grupo</div>
+    </div>
+
+    <div class="launch-tabs">
+      <button type="button" class="launch-tab active" data-tela="login" onclick="mostrarTelaAuth('login')">Entrar</button>
+      <button type="button" class="launch-tab" data-tela="cadastro" onclick="mostrarTelaAuth('cadastro')">Criar conta</button>
+    </div>
+
+    <form id="form-login" class="auth-form" onsubmit="handleLogin(event)">
+      <label class="campo"><span>E-mail</span>
+        <input type="email" id="login-email" required autocomplete="email" placeholder="voce@empresa.com">
+      </label>
+      <label class="campo"><span>Senha</span>
+        <input type="password" id="login-senha" required autocomplete="current-password" placeholder="••••••••">
+      </label>
+      <button type="submit" class="launch-submit" id="login-btn">Entrar</button>
+      <button type="button" class="auth-secondary" onclick="mostrarTelaAuth('esqueci')">Esqueci minha senha</button>
+    </form>
+
+    <form id="form-cadastro" class="auth-form hidden" onsubmit="handleCadastro(event)">
+      <label class="campo"><span>Nome completo</span>
+        <input type="text" id="cadastro-nome" required autocomplete="name" placeholder="Seu nome">
+      </label>
+      <label class="campo"><span>E-mail</span>
+        <input type="email" id="cadastro-email" required autocomplete="email" placeholder="voce@empresa.com">
+      </label>
+      <label class="campo"><span>Nome do grupo/empresa</span>
+        <input type="text" id="cadastro-grupo" required placeholder="Ex: Minha Equipe">
+      </label>
+      <label class="campo"><span>Senha</span>
+        <input type="password" id="cadastro-senha" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+      </label>
+      <label class="campo"><span>Confirmar senha</span>
+        <input type="password" id="cadastro-senha-confirma" required minlength="6" autocomplete="new-password" placeholder="Repita a senha">
+      </label>
+      <button type="submit" class="launch-submit" id="cadastro-btn">Criar conta e gerar planilha do grupo</button>
+    </form>
+
+    <form id="form-esqueci" class="auth-form hidden" onsubmit="handleEsqueciSenha(event)">
+      <p class="panel-hint">Informe o e-mail cadastrado. Se ele existir, enviaremos um código de verificação de 6 dígitos.</p>
+      <label class="campo"><span>E-mail</span>
+        <input type="email" id="esqueci-email" required placeholder="voce@empresa.com">
+      </label>
+      <button type="submit" class="launch-submit" id="esqueci-btn">Enviar código</button>
+      <button type="button" class="auth-secondary" onclick="mostrarTelaAuth('login')">Voltar ao login</button>
+    </form>
+
+    <form id="form-redefinir" class="auth-form hidden" onsubmit="handleRedefinirSenha(event)">
+      <p class="panel-hint">Digite o código de 6 dígitos enviado ao seu e-mail e escolha uma nova senha.</p>
+      <label class="campo"><span>Código</span>
+        <input type="text" id="redefinir-codigo" required maxlength="6" inputmode="numeric" placeholder="000000">
+      </label>
+      <label class="campo"><span>Nova senha</span>
+        <input type="password" id="redefinir-senha" required minlength="6" placeholder="Mínimo 6 caracteres">
+      </label>
+      <button type="submit" class="launch-submit" id="redefinir-btn">Redefinir senha</button>
+      <button type="button" class="auth-secondary" onclick="mostrarTelaAuth('login')">Voltar ao login</button>
+    </form>
+
+    <div id="auth-msg" class="auth-msg hidden"></div>
+  </div>
+</div>
+
+<div id="tela-dashboard" class="hidden">
+<div class="dash-header">
+  <div class="dash-header-inner">
+    <div class="dash-brand">
+      <span class="dash-brand-title">Ranking Geral</span>
+      <span class="dash-group-name" id="dash-nome-grupo">—</span>
+    </div>
+    <div class="dash-user">
+      <a id="dash-link-planilha" class="dash-sheet-link hidden" href="#" target="_blank" rel="noopener noreferrer">📊 Planilha do grupo</a>
+      <span class="dash-user-name" id="dash-nome-usuario">—</span>
+      <button type="button" onclick="handleLogout()">Sair</button>
+    </div>
+  </div>
+</div>
 
 <div class="top">
   <h1>Ranking Geral</h1>
@@ -357,22 +503,50 @@
   </div>
 
   <div id="launch-view-paste" style="display:none;">
-    <div class="panel-hint" style="margin-top:0;">Um participante por linha: <strong>Nome</strong> e <strong>pontuação</strong> separados por espaço ou tab. Nomes já cadastrados são reconhecidos automaticamente e ligados direto à faixa em que estão; nomes novos você aloca abaixo antes de confirmar.</div>
-    <textarea id="paste-area" placeholder="João 8&#10;Maria -1&#10;Pedro -1"></textarea>
+    <div class="panel-hint" style="margin-top:0;">Um participante por vez, separados por <strong>ponto e vírgula</strong> ou por <strong>linha</strong>, no formato <strong>Nome, Pontuação</strong>. Exemplo: <em>João, 8; Maria, -1; Pedro, -1;</em> — também funciona colando um embaixo do outro. Depois de ler, escolha se é um dia novo ou se vai substituir um dia já lançado, e confira a faixa de cada participante antes de confirmar.</div>
+    <textarea id="paste-area" placeholder="João, 8;&#10;Maria, -1;&#10;Pedro, -1;"></textarea>
     <div class="paste-actions">
       <button onclick="processPaste()">Ler colagem</button>
     </div>
     <div class="pending-panel" id="pending-panel" style="display:none;">
-      <div class="pending-title">Confirmar alocação do novo dia</div>
+      <div class="pending-title">Confirmar lançamento dos dados colados</div>
+      <div class="pending-controls">
+        <label>Aplicar em: <select id="pending-day-select"></select></label>
+        <label>Faixa para todos: <select id="pending-bulk-div" onchange="applyBulkDiv(this.value)">
+          <option value="">— escolher —</option>
+          <option value="x">Faixa X</option>
+          <option value="y">Faixa Y</option>
+        </select></label>
+      </div>
       <div id="pending-list"></div>
       <div class="pending-actions">
-        <button onclick="confirmImport()">Lançar dia</button>
+        <button onclick="confirmImport()">Lançar</button>
         <button class="danger" onclick="cancelImport()">Cancelar</button>
       </div>
     </div>
   </div>
 </div>
 
+<div class="panel accent-x">
+  <div class="panel-title">📊 Painel Utilitário / Estatísticas</div>
+  <div class="panel-hint">Visão geral rápida com métricas acumuladas do ranking.</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-label">Total de Dias</span>
+      <span class="stat-value" id="stat-days">0</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Participantes Faixa X</span>
+      <span class="stat-value" id="stat-x-count">0</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Participantes Faixa Y</span>
+      <span class="stat-value" id="stat-y-count">0</span>
+    </div>
+  </div>
+</div>
+
+<!-- TELA DE VISUALIZAÇÃO DO RANKING (Somente Leitura) -->
 <div class="board">
   <div class="division x" id="div-x">
     <div class="division-head">
@@ -383,10 +557,6 @@
     </div>
     <div class="table-wrap"><table><thead><tr id="head-x"></tr></thead><tbody id="body-x"></tbody></table></div>
     <div class="empty-hint" id="empty-x" style="display:none;">Nenhum participante ainda.</div>
-    <div class="row-actions">
-      <button onclick="addParticipant('x')">+ Participante</button>
-      <button onclick="addDay()">+ Dia em branco</button>
-    </div>
   </div>
 
   <div class="division y" id="div-y">
@@ -398,10 +568,6 @@
     </div>
     <div class="table-wrap"><table><thead><tr id="head-y"></tr></thead><tbody id="body-y"></tbody></table></div>
     <div class="empty-hint" id="empty-y" style="display:none;">Nenhum participante ainda.</div>
-    <div class="row-actions">
-      <button onclick="addParticipant('y')">+ Participante</button>
-      <button onclick="addDay()">+ Dia em branco</button>
-    </div>
   </div>
 </div>
 
@@ -425,33 +591,173 @@
   Regras aplicadas: ganho máximo diário +10 · critério 1 — maior pontuação acumulada · critério 2+ — compara o resultado do dia mais recente e retrocede um dia por vez até achar diferença · 0 > -1 > -2, um -2 nunca fica acima de um -1 no mesmo dia comparado.
 </div>
 
-<script>
-const DEFAULT_DAYS = 7;
-const DEFAULT_X_NAMES = [
-  'Gov.br', 'COVKHOZ', 'KFS empreendimentos', 'Supermercado rede compras',
-  'Trevisan Ltda', 'Leds eletricks', 'VantrexCorp', 'ESTIVA BRASIL',
-  'Picleneudas', 'Golden Excellence', 'lobo de wall street', 'Raio de Sol'
-];
-const DEFAULT_Y_NAMES = [
-  'KODAK Co', 'MEGAFONE', 'Brazil Recicle', 'VSV EMPREENDIMENTOS Corp',
-  'Mansant Ltd', 'THE REALES', 'Jotas Ltda.', 'RussiCo Ltd',
-  'Vertice Aeroespacial', 'Grupo Astro SA', 'Fluent corporation', 'City06',
-  'Fazendas Bassi S.A', 'GRUPO EVER CORP', 'Raystem rr Corp', 'GLASSTOMIC', 'FLX BRAZIL'
-];
+</div><!-- /#tela-dashboard -->
 
-function buildDefaultState(){
-  return {
-    days: DEFAULT_DAYS,
-    x: DEFAULT_X_NAMES.map(name => ({ name, scores: Array(DEFAULT_DAYS).fill(null) })),
-    y: DEFAULT_Y_NAMES.map(name => ({ name, scores: Array(DEFAULT_DAYS).fill(null) }))
-  };
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzff_8M64h_h4fpRUJ92UWUVJr80ZNyYE_C2Ko3LGIkPknZLZYelbnFSTYLlP_nKTLD/exec';
+
+let usuarioAtual = null;
+let emailRecuperacaoAtual = '';
+
+async function chamarAPI(payload){
+  const resposta = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+  if(!resposta.ok) throw new Error('Erro de rede (HTTP ' + resposta.status + ')');
+  return resposta.json();
 }
 
-let state = buildDefaultState();
+async function chamarAPIGet(params){
+  const query = new URLSearchParams(params).toString();
+  const resposta = await fetch(API_URL + '?' + query);
+  if(!resposta.ok) throw new Error('Erro de rede (HTTP ' + resposta.status + ')');
+  return resposta.json();
+}
+
+function mostrarMensagemAuth(texto, ok){
+  const el = document.getElementById('auth-msg');
+  el.textContent = texto;
+  el.classList.remove('hidden', 'ok', 'erro');
+  el.classList.add(ok ? 'ok' : 'erro');
+}
+function esconderMensagemAuth(){
+  document.getElementById('auth-msg').classList.add('hidden');
+}
+function definirCarregando(btn, carregando, textoNormal){
+  btn.disabled = carregando;
+  btn.textContent = carregando ? 'Aguarde...' : textoNormal;
+}
+
+function mostrarTelaAuth(nome){
+  ['login','cadastro','esqueci','redefinir'].forEach(function(n){
+    document.getElementById('form-' + n).classList.toggle('hidden', n !== nome);
+  });
+  document.querySelectorAll('.launch-tab[data-tela]').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.tela === nome);
+  });
+  esconderMensagemAuth();
+}
+
+function mostrarDashboard(dados){
+  usuarioAtual = dados;
+  document.getElementById('tela-auth').classList.add('hidden');
+  document.getElementById('tela-dashboard').classList.remove('hidden');
+  document.getElementById('dash-nome-grupo').textContent = dados.grupo ? dados.grupo.nomeGrupo : '—';
+  document.getElementById('dash-nome-usuario').textContent = dados.nome + ' · ' + dados.status;
+  const linkPlanilha = document.getElementById('dash-link-planilha');
+  if(dados.grupo && dados.grupo.urlPlanilhaGrupo){
+    linkPlanilha.href = dados.grupo.urlPlanilhaGrupo;
+    linkPlanilha.classList.remove('hidden');
+  } else {
+    linkPlanilha.classList.add('hidden');
+  }
+  loadState();
+}
+
+function handleLogout(){
+  usuarioAtual = null;
+  state = { days: 0, x: [], y: [] };
+  loaded = false;
+  document.getElementById('tela-dashboard').classList.add('hidden');
+  document.getElementById('tela-auth').classList.remove('hidden');
+  document.getElementById('form-login').reset();
+  mostrarTelaAuth('login');
+}
+
+async function handleLogin(event){
+  event.preventDefault();
+  const btn = document.getElementById('login-btn');
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  esconderMensagemAuth();
+  definirCarregando(btn, true, 'Entrar');
+  try{
+    const resposta = await chamarAPI({ action:'autenticarUsuario', email:email, senha:senha });
+    if(!resposta.sucesso){ mostrarMensagemAuth(resposta.erro || 'Não foi possível entrar.', false); return; }
+    mostrarDashboard(resposta.dados);
+  }catch(erro){
+    console.error(erro);
+    mostrarMensagemAuth('Erro de conexão. Verifique a URL da API (API_URL) e sua internet.', false);
+  }finally{
+    definirCarregando(btn, false, 'Entrar');
+  }
+}
+
+async function handleCadastro(event){
+  event.preventDefault();
+  const btn = document.getElementById('cadastro-btn');
+  const textoOriginal = 'Criar conta e gerar planilha do grupo';
+  const nome = document.getElementById('cadastro-nome').value.trim();
+  const email = document.getElementById('cadastro-email').value.trim();
+  const nomeGrupo = document.getElementById('cadastro-grupo').value.trim();
+  const senha = document.getElementById('cadastro-senha').value;
+  const senhaConfirma = document.getElementById('cadastro-senha-confirma').value;
+  esconderMensagemAuth();
+
+  if(senha !== senhaConfirma){ mostrarMensagemAuth('As senhas não coincidem.', false); return; }
+  if(senha.length < 6){ mostrarMensagemAuth('A senha deve ter pelo menos 6 caracteres.', false); return; }
+
+  definirCarregando(btn, true, textoOriginal);
+  try{
+    const resposta = await chamarAPI({ action:'cadastrarUsuario', dados:{ nome:nome, email:email, senha:senha, nomeGrupo:nomeGrupo } });
+    if(!resposta.sucesso){ mostrarMensagemAuth(resposta.erro || 'Não foi possível cadastrar.', false); return; }
+    mostrarDashboard(resposta.dados);
+  }catch(erro){
+    console.error(erro);
+    mostrarMensagemAuth('Erro de conexão. Verifique a URL da API (API_URL) e sua internet.', false);
+  }finally{
+    definirCarregando(btn, false, textoOriginal);
+  }
+}
+
+async function handleEsqueciSenha(event){
+  event.preventDefault();
+  const btn = document.getElementById('esqueci-btn');
+  const email = document.getElementById('esqueci-email').value.trim();
+  esconderMensagemAuth();
+  definirCarregando(btn, true, 'Enviar código');
+  try{
+    const resposta = await chamarAPI({ action:'recuperarSenha', email:email });
+    if(!resposta.sucesso){ mostrarMensagemAuth(resposta.erro || 'Não foi possível processar o pedido.', false); return; }
+    emailRecuperacaoAtual = email;
+    mostrarTelaAuth('redefinir');
+    mostrarMensagemAuth('Se o e-mail existir em nossa base, um código de 6 dígitos foi enviado. Confira sua caixa de entrada.', true);
+  }catch(erro){
+    console.error(erro);
+    mostrarMensagemAuth('Erro de conexão. Verifique a URL da API (API_URL) e sua internet.', false);
+  }finally{
+    definirCarregando(btn, false, 'Enviar código');
+  }
+}
+
+async function handleRedefinirSenha(event){
+  event.preventDefault();
+  const btn = document.getElementById('redefinir-btn');
+  const codigo = document.getElementById('redefinir-codigo').value.trim();
+  const novaSenha = document.getElementById('redefinir-senha').value;
+  esconderMensagemAuth();
+
+  if(novaSenha.length < 6){ mostrarMensagemAuth('A nova senha deve ter pelo menos 6 caracteres.', false); return; }
+
+  definirCarregando(btn, true, 'Redefinir senha');
+  try{
+    const resposta = await chamarAPI({ action:'redefinirSenha', email:emailRecuperacaoAtual, codigo:codigo, novaSenha:novaSenha });
+    if(!resposta.sucesso){ mostrarMensagemAuth(resposta.erro || 'Não foi possível redefinir a senha.', false); return; }
+    document.getElementById('form-redefinir').reset();
+    document.getElementById('login-email').value = emailRecuperacaoAtual;
+    mostrarTelaAuth('login');
+    mostrarMensagemAuth('Senha redefinida com sucesso! Faça login com sua nova senha.', true);
+  }catch(erro){
+    console.error(erro);
+    mostrarMensagemAuth('Erro de conexão. Verifique a URL da API (API_URL) e sua internet.', false);
+  }finally{
+    definirCarregando(btn, false, 'Redefinir senha');
+  }
+}
+
+let state = { days: 0, x: [], y: [] };
 let loaded = false;
 let pendingImport = null;
+let pendingDayMode = 'new';
 
-// rascunho (não salvo) do formulário de lançamento do dia
 let draft = { x:{}, y:{} };
 let draftNew = { x:[], y:[] };
 
@@ -546,21 +852,48 @@ function findDivision(name){
 
 function processPaste(){
   const text = document.getElementById('paste-area').value;
-  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  const chunks = text.split(/[;\n]+/).map(s=>s.trim()).filter(Boolean);
   const parsed = [];
-  for(const line of lines){
-    const m = line.match(/^(.*\S)[\s\t]+(-?\d+(?:[.,]\d+)?)$/);
-    if(!m) continue;
+  const skipped = [];
+  for(const chunk of chunks){
+    let m = chunk.match(/^(.+),\s*(-?\d+(?:[.,]\d+)?)\s*$/);
+    if(!m) m = chunk.match(/^(.+?)[\s\t]+(-?\d+(?:[.,]\d+)?)\s*$/);
+    if(!m){ skipped.push(chunk); continue; }
     const value = parseFloat(m[2].replace(',', '.'));
-    if(isNaN(value)) continue;
+    if(isNaN(value)){ skipped.push(chunk); continue; }
     parsed.push({ name: m[1].trim(), value: Math.min(value, 10) });
   }
   if(!parsed.length){
-    alert('Não consegui ler nenhuma linha. Formato esperado: Nome  Pontuação (um por linha).');
+    alert('Não consegui ler nenhum participante. Use o formato: Nome, Pontuação; um por ponto e vírgula ou por linha.');
     return;
   }
-  pendingImport = parsed.map(e => ({ ...e, div: findDivision(e.name) }));
+  pendingImport = parsed.map(e=>{
+    const known = findDivision(e.name);
+    return { ...e, knownDiv: known, div: known || 'x' };
+  });
+  pendingDayMode = 'new';
   renderPending();
+}
+
+function populatePendingDaySelect(){
+  const sel = document.getElementById('pending-day-select');
+  if(!sel) return;
+  let opts = `<option value="new">Novo dia (Dia ${state.days + 1})</option>`;
+  for(let d = state.days - 1; d >= 0; d--){
+    opts += `<option value="${d}">Dia ${d+1} (substituir)</option>`;
+  }
+  sel.innerHTML = opts;
+  sel.value = pendingDayMode === 'new' ? 'new' : String(pendingDayMode);
+  sel.onchange = () => {
+    pendingDayMode = sel.value === 'new' ? 'new' : parseInt(sel.value, 10);
+  };
+}
+
+function applyBulkDiv(value){
+  if(!value || !pendingImport) return;
+  pendingImport.forEach(e => e.div = value);
+  renderPending();
+  document.getElementById('pending-bulk-div').value = value;
 }
 
 function renderPending(){
@@ -568,33 +901,42 @@ function renderPending(){
   const list = document.getElementById('pending-list');
   if(!pendingImport || !pendingImport.length){ panel.style.display='none'; return; }
   panel.style.display = 'block';
+  populatePendingDaySelect();
   list.innerHTML = pendingImport.map((e, i)=>{
     const valClass = e.value < 0 ? 'val-neg' : e.value > 0 ? 'val-pos' : '';
-    const allocator = e.div
-      ? `<span class="tag-known">${e.div === 'x' ? 'Faixa X (já cadastrado)' : 'Faixa Y (já cadastrado)'}</span>`
-      : `<select onchange="pendingImport[${i}].div=this.value">
-           <option value="x">Faixa X</option>
-           <option value="y">Faixa Y</option>
-         </select>`;
+    const tag = e.knownDiv
+      ? `<span class="tag-known">já em Faixa ${e.knownDiv.toUpperCase()}</span>`
+      : `<span class="tag-known" style="color:var(--y-color);">novo</span>`;
     return `<div class="pending-row">
       <span class="pname">${e.name}</span>
-      <span class="pval ${valClass}">${e.value}</span>
-      ${allocator}
+      <span class="pval ${valClass}">${scoreTag(e.value)}</span>
+      ${tag}
+      <select onchange="pendingImport[${i}].div=this.value">
+        <option value="x" ${e.div==='x'?'selected':''}>Faixa X</option>
+        <option value="y" ${e.div==='y'?'selected':''}>Faixa Y</option>
+      </select>
     </div>`;
   }).join('');
 }
 
 function cancelImport(){
   pendingImport = null;
+  pendingDayMode = 'new';
   document.getElementById('pending-panel').style.display = 'none';
 }
 
 function confirmImport(){
   if(!pendingImport || !pendingImport.length) return;
-  state.days += 1;
-  state.x.forEach(p=>p.scores.push(null));
-  state.y.forEach(p=>p.scores.push(null));
-  const newIdx = state.days - 1;
+
+  let dayIdx;
+  if(pendingDayMode === 'new'){
+    state.days += 1;
+    state.x.forEach(p=>p.scores.push(null));
+    state.y.forEach(p=>p.scores.push(null));
+    dayIdx = state.days - 1;
+  } else {
+    dayIdx = pendingDayMode;
+  }
 
   pendingImport.forEach(e=>{
     const div = e.div || 'x';
@@ -604,30 +946,26 @@ function confirmImport(){
       p = { name: e.name, scores: Array(state.days).fill(null) };
       list.push(p);
     }
-    p.scores[newIdx] = e.value;
+    p.scores[dayIdx] = e.value;
   });
 
   pendingImport = null;
+  pendingDayMode = 'new';
   document.getElementById('pending-panel').style.display = 'none';
   document.getElementById('paste-area').value = '';
   switchLaunchTab('form');
   saveState(); render();
 }
 
-const STORAGE_KEY="ranking-state";
-
-/* ======================================================================
-   ARMAZENAMENTO EM SERVIDOR GRATUITO (JSONBin.io)
-   1) Crie uma conta grátis em https://jsonbin.io
-   2) Em "API Keys" copie sua X-MASTER-KEY e cole abaixo em JSONBIN_KEY
-   3) Crie um Bin novo (pode salvar {} como conteúdo inicial) e copie o
-      Bin ID da URL do painel, colando abaixo em JSONBIN_ID
-   O localStorage continua sendo usado apenas como cópia de segurança
-   local, caso o site fique sem internet ou o servidor esteja fora do ar.
-   ====================================================================== */
-const JSONBIN_ID  = "6a6c9988da38895dfea879a5";
-const JSONBIN_KEY = "$2a$10$tJO4TeChfpvr8puMi4P1/eWqjnDKT13GfmtvUixO9MGyEzbS8jHgi";
-const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+function updateStatsPanel(){
+  const elDays = document.getElementById('stat-days');
+  const elX = document.getElementById('stat-x-count');
+  const elY = document.getElementById('stat-y-count');
+  
+  if(elDays) elDays.textContent = state.days;
+  if(elX) elX.textContent = state.x.length;
+  if(elY) elY.textContent = state.y.length;
+}
 
 function setStatus(text, ok){
   const el = document.getElementById('sync-status');
@@ -637,28 +975,22 @@ function setStatus(text, ok){
 }
 
 async function loadState(){
-  setStatus('carregando do servidor...', 'busy');
+  if(!usuarioAtual || !usuarioAtual.grupo) return;
+  setStatus('carregando dados do grupo...', 'busy');
   try{
-    const res = await fetch(`${JSONBIN_URL}/latest`, {
-      headers: { 'X-Master-Key': JSONBIN_KEY }
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    const parsed = data.record;
-    if(parsed && typeof parsed.days === "number" && Array.isArray(parsed.x) && Array.isArray(parsed.y)){
-      state = parsed;
+    const resposta = await chamarAPIGet({ action:'listarRanking', idPlanilhaGrupo: usuarioAtual.grupo.idPlanilhaGrupo });
+    if(!resposta.sucesso) throw new Error(resposta.erro || 'Falha ao carregar');
+    const carregado = resposta.dados;
+    if(carregado && typeof carregado.days === "number" && Array.isArray(carregado.x) && Array.isArray(carregado.y)){
+      state = carregado;
+    } else {
+      state = { days: 0, x: [], y: [] };
     }
     setStatus('sincronizado ✓', true);
   }catch(e){
-    console.error("Erro ao carregar do servidor", e);
-    try{
-      const cached = localStorage.getItem(STORAGE_KEY);
-      if(cached){
-        const parsed = JSON.parse(cached);
-        if(parsed && typeof parsed.days === "number" && Array.isArray(parsed.x) && Array.isArray(parsed.y)) state = parsed;
-      }
-    }catch(e2){console.error("Erro ao carregar cópia local", e2);}
-    setStatus('offline — usando cópia local salva neste navegador', false);
+    console.error("Erro ao carregar dados do grupo", e);
+    state = { days: 0, x: [], y: [] };
+    setStatus('erro ao carregar — recarregue a página para tentar de novo', false);
   }
   loaded = true;
   render();
@@ -666,51 +998,22 @@ async function loadState(){
 
 let saveTimeout = null;
 function saveState(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-  catch(e){ console.error("Erro ao salvar cópia local", e); }
-
+  if(!usuarioAtual) return;
   clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(syncToServer, 700);
+  saveTimeout = setTimeout(syncToServer, 900);
 }
 
 async function syncToServer(){
+  if(!usuarioAtual || !usuarioAtual.grupo) return;
   setStatus('salvando...', 'busy');
   try{
-    const res = await fetch(JSONBIN_URL, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': JSONBIN_KEY
-      },
-      body: JSON.stringify(state)
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    const resposta = await chamarAPI({ action:'salvarRanking', idPlanilhaGrupo: usuarioAtual.grupo.idPlanilhaGrupo, estado: state });
+    if(!resposta.sucesso) throw new Error(resposta.erro || 'Falha ao salvar');
     setStatus('sincronizado ✓', true);
   }catch(e){
     console.error("Erro ao salvar no servidor", e);
-    setStatus('erro ao sincronizar (dado salvo só neste navegador)', false);
+    setStatus('erro ao sincronizar — suas últimas alterações podem não ter sido salvas', false);
   }
-}
-
-function addParticipant(div){
-  const name = prompt('Nome do participante:');
-  if(!name) return;
-  const list = state[div];
-  list.push({ name: name.trim(), scores: Array(state.days).fill(null) });
-  saveState(); render();
-}
-
-function removeParticipant(div, idx){
-  state[div].splice(idx,1);
-  saveState(); render();
-}
-
-function renameParticipant(div, idx){
-  const current = state[div][idx].name;
-  const name = prompt('Novo nome:', current);
-  if(!name || !name.trim() || name.trim() === current) return;
-  state[div][idx].name = name.trim();
-  saveState(); render();
 }
 
 function addDay(){
@@ -734,21 +1037,10 @@ function resetAll(){
   saveState(); render();
 }
 
-function updateScore(div, idx, dayIdx, value){
-  let v = value.trim();
-  let num = v === '' ? null : parseFloat(v);
-  if(num !== null && isNaN(num)) num = null;
-  if(num !== null && num > 10) num = 10; // ganho máximo diário
-  state[div][idx].scores[dayIdx] = num;
-  saveState();
-  renderDivision(div); // re-sort without full redraw of inputs elsewhere
-}
-
 function total(p){
   return p.scores.reduce((s,v)=> s + (v ?? 0), 0);
 }
 
-// devolve o índice do dia (mais recente -> mais antigo) que decide o empate, ou null se total já difere ou segue empatado
 function tiebreakDay(a,b){
   for(let d=state.days-1; d>=0; d--){
     const av = a.scores[d] ?? 0;
@@ -769,6 +1061,9 @@ function sortDivision(div){
   return list;
 }
 
+/* ======================================================================
+   RENDERIZAÇÃO DA TABELA SOMENTE LEITURA
+   ====================================================================== */
 function renderDivision(div){
   const head = document.getElementById('head-'+div);
   const body = document.getElementById('body-'+div);
@@ -776,7 +1071,7 @@ function renderDivision(div){
 
   let headHtml = '<th class="rank-h">#</th><th class="name-h" style="text-align:left;">Nome</th>';
   for(let d=0; d<state.days; d++) headHtml += `<th>D${d+1}</th>`;
-  headHtml += '<th>Total</th><th></th>';
+  headHtml += '<th>Total</th>';
   head.innerHTML = headHtml;
 
   const sorted = sortDivision(div);
@@ -788,9 +1083,8 @@ function renderDivision(div){
     for(let d=0; d<state.days; d++){
       const val = p.scores[d];
       const cls = val === null ? '' : (val < 0 ? 'val-neg' : val > 0 ? 'val-pos' : '');
-      cells += `<td><input class="score ${cls}" type="text" inputmode="numeric" pattern="-?[0-9]*"
-        value="${val === null ? '' : val}"
-        onchange="updateScore('${div}', ${p.idx}, ${d}, this.value)"></td>`;
+      const textVal = val === null ? '—' : (val > 0 ? `+${val}` : `${val}`);
+      cells += `<td class="${cls}">${textVal}</td>`;
     }
     let tieTag = '';
     if(rank < sorted.length - 1){
@@ -805,17 +1099,9 @@ function renderDivision(div){
       <td class="name">${p.name}${tieTag}</td>
       ${cells}
       <td class="total">${p.total}</td>
-      <td><div class="row-btns">
-        <button class="del-x-btn" onclick="renameParticipant('${div}', ${p.idx})" title="Renomear">✎</button>
-        <button class="del-x-btn" onclick="removeParticipant('${div}', ${p.idx})" title="Remover">✕</button>
-      </div></td>
     </tr>`;
   }).join('');
 }
-
-/* ---------------------------------------------------------------------
-   Formulário de lançamento do dia (aba "Preencher")
-   --------------------------------------------------------------------- */
 
 function switchLaunchTab(tab){
   const formView = document.getElementById('launch-view-form');
@@ -980,6 +1266,7 @@ function render(){
   renderDivision('y');
   populateDaySelect();
   renderLaunchForm();
+  updateStatsPanel();
   bindDragScroll();
   generateSummary();
 }
@@ -1010,7 +1297,6 @@ window.addEventListener('beforeunload',saveState);
 window.addEventListener('pagehide',saveState);
 window.addEventListener('blur',saveState);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveState();});
-loadState();
 </script>
 </body>
 </html>
